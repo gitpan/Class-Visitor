@@ -1,8 +1,8 @@
 Summary: Perl module for creating Visitor methods on classes
 Name: Class-Visitor
-Version: 0.01
+Version: 0.02
 Release: 1
-Source: ftp://ftp.uu.net/vendor/bitsko/gdo/Class-Visitor-0.01.tar.gz
+Source: ftp://ftp.uu.net/vendor/bitsko/gdo/Class-Visitor-0.02.tar.gz
 Copyright: GPL/Perl
 Group: Utilities/Text
 URL: http://www.bitsko.slc.ut.us/

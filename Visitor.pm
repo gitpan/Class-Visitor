@@ -3,7 +3,7 @@
 # Class::Visitor is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
-# $Id: Visitor.pm,v 1.2 1997/10/19 23:13:14 ken Exp $
+# $Id: Visitor.pm,v 1.3 1997/11/03 17:38:10 ken Exp $
 #
 
 package Class::Visitor;
@@ -16,7 +16,7 @@ require Exporter;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 use Class::Template;
 use Class::Iter;
@@ -48,23 +48,27 @@ EOF
     build_push_methods_( $ref, \$out, \@methods, \%refs, \%arrays, \%hashes );
 
 
-    my $visit_method = $pkg;
-    $visit_method =~ s/::/_/g;
-    $out .= <<EOF;
+    my $str = <<'EOF';
   sub accept {
-    my \$self = shift; my \$visitor = shift;
-    \$visitor->visit_$visit_method (\$self, \@_);
+    my $self = shift; my $visitor = shift;
+    $visitor->visit_!visit_method! ($self, @_);
   }
   # [self, parent, array, index]
   sub iter {
-    my \$iter = [\@_];
-    bless \$iter, '${pkg}::Iter';
+    my $iter = [@_];
+    bless $iter, '!package!::Iter';
   }
-EOF
 
-    $out .= "}\n1;\n";
+  sub new {
+    my ($type) = shift;
 
-    my $str .= <<'EOF';
+    my ($self) = !type!;
+    bless ($self, $type);
+
+    return ($self);
+  }
+}
+
 {
   package !package!::Iter;
 
@@ -73,8 +77,12 @@ EOF
     $visitor->visit_!visit_method! ($self, @_);
   }
 EOF
+        my $visit_method = $pkg;
+        $visit_method =~ s/::/_/g;
         $str =~ s/!package!/$pkg/g;
         $str =~ s/!visit_method!/$visit_method/g;
+        my $type = (ref ($ref) eq 'HASH') ? '{@_}' : '[@_]';
+        $str =~ s/!type!/$type/g;
         $out .= $str;
 
         build_iter_methods_( $ref, \$out, \@methods, \%refs, \%arrays, \%hashes );
@@ -108,7 +116,7 @@ EOF
   }
 EOF
 	    }
-	    my $str .= <<'EOF';
+	    my $str = <<'EOF';
   sub push_!member! {
       my $self = shift;
       return ($self->[0]->push_!member! (@_));
@@ -149,6 +157,7 @@ sub build_push_methods_ {
     my $type = ref $ref;
 
     my $method;
+    my $cnt = 0;		# count used for array classes
     foreach $method (@$methods) {
 	if (defined $arrays->{$method}) {
 	    if ($method eq 'contents') {
@@ -170,15 +179,15 @@ EOF
             my $str = <<'EOF';
   sub push_!member! {
       my $self = shift;
-      push (@{$self->{'!member!'}}, @_);
+      push (@{$self->!member_ref!}, @_);
   }
   sub pop_!member! {
       my $self = shift;
-      return (pop (@{$self->{'!member!'}}));
+      return (pop (@{$self->!member_ref!}));
   }
   sub !member!_as_string {
       my $self = shift;
-      my $array = $self->{'!member!'};
+      my $array = $self->!member_ref!;
       my @string;
       my $ii;
       for ($ii = 0; $ii <= $#$array; $ii ++) {
@@ -195,7 +204,7 @@ EOF
   }
   sub children_accept_!member! {
     my $self = shift; my $visitor = shift;
-    my $array = $self->!member!();
+    my $array = $self->!member_ref!;
     my $ii;
     for ($ii = 0; $ii <= $#$array; $ii ++) {
 	my ($child) = $array->[$ii];
@@ -208,21 +217,16 @@ EOF
   }
 EOF
             $str =~ s/!member!/$method/g;
+            my $member_ref = ($type eq 'HASH') ? "{'$method'}" : "[$cnt]";
+            $str =~ s/!member_ref!/$member_ref/g;
             $$out .= $str;
         }
+
+        $cnt ++;
     }
 }
 
 package Class::Visitor::Base;
-
-sub new {
-    my ($type) = shift;
-
-    my ($self) = {@_};
-    bless ($self, $type);
-
-    return ($self);
-}
 
 sub is_iter {
     return 0;

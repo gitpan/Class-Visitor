@@ -1,3 +1,11 @@
+Fri Oct 31 14:03:18 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Visitor.pm (visitor_class): add `new' to each class
+
+Thu Oct 30 12:23:09 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Visitor.pm: use class type specific instead of `->{'!member!'}'
+
 Sun Oct 19 16:19:17 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
 
 	* Visitor.pm (Class::Visitor::Base): added
