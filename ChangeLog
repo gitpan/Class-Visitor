@@ -1,0 +1,15 @@
+Sun Oct 19 16:19:17 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Visitor.pm (Class::Visitor::Base): added
+	(visitor_class): use `Class::Iter' as base Iter matching
+ 	Class::Visitor::Base
+
+Sat Oct 18 11:22:40 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Class-Visitor.spec (%doc): no file `COPYING'
+	(%files): typo, listed same file twice
+
+	* Makefile.PL: deleted comment that messes up `make-rel'
+
+	* MANIFEST: added ChangeLog
+
